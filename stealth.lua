@@ -1,1 +1,1 @@
-print("Soon")
+print("SOON")
