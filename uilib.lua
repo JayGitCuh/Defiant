@@ -2452,7 +2452,7 @@ function library:Init()
     self.base = library:Create("ScreenGui", {IgnoreGuiInset = true, ZIndexBehavior = Enum.ZIndexBehavior.Global})
     if runService:IsStudio() then
         self.base.Parent = script.Parent.Parent
-    else then
+    else
         pcall(function() self.base.RobloxLocked = true end)
         self.base.Parent = game:GetService"CoreGui"
     end
