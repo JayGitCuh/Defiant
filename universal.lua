@@ -84,11 +84,6 @@ miscMovement:AddSlider{text = "Speed", flag = "cframespeed", min = 10.00, max = 
 miscMovement:AddList({text = "Type", flag = "bhoptype", value = "Rage", values = {"Rage", "Legit"}});
 miscMovement:AddToggle{text = "Infinite Jump", flag = "infjump"};
 
-local chatspamSection = miscColumn2:AddSection("Chat-Spam");
-chatspamSection:AddToggle{text = "Advertise", flag = "chatadvertiser"};
-chatspamSection:AddToggle{text = "Chat Spam", flag = "chatspammer"};
-chatspamSection:AddBox({text = "Spam Text", value = "", flag = "spamtext"});
-
 local miscSection = miscColumn2:AddSection("Misc");
 miscSection:AddButton({text = "Rejoin", callback = function()
     game:GetService("TeleportService"):Teleport(game.PlaceId)
