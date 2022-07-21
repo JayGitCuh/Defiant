@@ -40,7 +40,7 @@ local visualsColumn2 = visualsTab:AddColumn();
 local skinchangerSection = visualsColumn2:AddSection("Skin Changer");
 
 skinchangerSection:AddToggle{text = "Custom Skin", flag = "visskin"};
-skinchangerSection:AddBox({text = "Spam Text", value = "6760332320", flag = "visskinID"});
+skinchangerSection:AddBox({text = "Skin ID", value = "6760332320", flag = "visskinID"});
 
 local hitsounds = {
     ["Bell"] = "rbxassetid://6779227552",
