@@ -1,6 +1,6 @@
 local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/JayGitCuh/Defiant/main/uilib.lua'))()
 getgenv().library.title = "Defiant Framework | Arsenal"
-getgenv().library.foldername = "defiantcfg\\arsenal"
+getgenv().library.foldername = "defiant\\arsenal\\config"
 
 local UIS = game:GetService("UserInputService")
 local dwRunservice = game:GetService("RunService")
@@ -26,15 +26,8 @@ espSection:AddToggle{text = "Weapon", flag = "espweapon"};
 espSection:AddToggle{text = "Skeleton", flag = "espskeleton"};
 espSection:AddToggle{text = "Look-Angle", flag = "esplookangle"};
 espSection:AddDivider("Indicators");
-espSection:AddToggle{text = "Enabled", flag = "indicators"};
-espSection:AddToggle{text = "Dynamic", flag = "indynamic"};
-
-local visualsColumn2 = visualsTab:AddColumn();
-local skinchangerSection = visualsColumn2:AddSection("Skin Changer");
-
-skinchangerSection:AddToggle{text = "Custom Skin", flag = "visskin"};
-skinchangerSection:AddBox({text = "Spam Text", value = "6760332320", flag = "visskinID"});
-
+espSection:AddToggle{text = "Enabled", flag = "indicators"}:AddColor({flag = "indcolor", color = Color3.new(255, 0, 0)});
+espSection:AddSlider{text = "Radius", flag = "indradius", min = 40, max = 400, value = 80, float = 0.001, suffix = "°"};
 espSection:AddDivider("Settings");
 espSection:AddToggle{text = "Show Team", flag = "espshowteam"}:AddColor({flag = "espteamcolor", color = Color3.new(0, 0, 255)});
 espSection:AddToggle{text = "Highlight Target", flag = "esphighlighttarget"}:AddColor({flag = "esphighlightcolor", color = Color3.new(0, 255, 0)});
@@ -42,6 +35,30 @@ espSection:AddToggle{text = "Attach to mouse", flag = "espsnaplinesymouse"};
 espSection:AddSlider{text = "Snapline Y Axis", flag = "espsnaplineyaxis", min = 0, max = 1000, value = 20, float = 0.001, suffix = "°"};
 espSection:AddSlider{text = "Font Size", flag = "espinfosize", min = 0.1, max = 50, value = 20, float = 0.001, suffix = "°"};
 espSection:AddSlider{text = "Max Distance", flag = "espmaxdistance", min = 10, max = 4000, value = 1500, float = 10, suffix = "°"};
+
+local visualsColumn2 = visualsTab:AddColumn();
+local skinchangerSection = visualsColumn2:AddSection("Skin Changer");
+
+skinchangerSection:AddToggle{text = "Custom Skin", flag = "visskin"};
+skinchangerSection:AddBox({text = "Spam Text", value = "6760332320", flag = "visskinID"});
+
+local hitsounds = {
+    ["Bell"] = "rbxassetid://6779227552",
+    ["Taco Bell"] = "rbxassetid://5696182212",
+    ["Ding"] = "rbxassetid://7128958209",
+    ["Custom"] = getsynasset("DefiantCFG/Hitsounds/custom.wav")
+}
+
+local hitsoundlist = {}
+for i,v in next, hitsounds do
+	table.insert(hitsoundlist, i)
+end
+
+local hitsoundsec = visualsColumn2:AddSection("Hitsound");
+hitsoundsec:AddToggle{text = "Sound", flag = "hitsound"}:AddList({flag = "hitsoundlist", value = hitsoundlist[1], values = hitsoundlist});
+
+local bulletSec = visualsColumn2:AddSection("Bullet Tracers");
+bulletSec:AddToggle{text = "Tracers", flag = "bullettracers"}:AddColor({flag = "tracercolor", color = Color3.new(1, 0, 0)});
 
 local LegitTab = library:AddTab("Aimbot");
 local LegitColunm1 = LegitTab:AddColumn();
@@ -80,9 +97,13 @@ LegitAimbot:AddSlider{text = "FOV Transparency", flag = "aimbotfovtrans", min = 
 local LegitColunm2 = LegitTab:AddColumn();
 local LegitSilent = LegitColunm2:AddSection("Silent-Aim");
 LegitSilent:AddToggle{text = "Silent Aim", flag = "silentaimbot"};
-LegitSilent:AddSlider{text = "Hit Chance", flag = "silenthitchance", min = 0, max = 100, value = 100, suffix = "%"}
+LegitSilent:AddSlider{text = "Hit Chance", flag = "silenthitchance", min = 0, max = 100, value = 100, suffix = "%"};
 LegitSilent:AddToggle{text = "Autoshoot", flag = "autoshoot"};
 LegitSilent:AddToggle{text = "Ignore FOV", flag = "ignorefovaimbot"};
+
+local LegitTriggerbot = LegitColunm2:AddSection("Triggerbot");
+LegitTriggerbot:AddToggle{text = "Enable", flag = "triggerbot"};
+LegitTriggerbot:AddSlider{text = "Delay", flag = "tbdelay", min = 0, max = 300, value = 0, float = 0.1, suffix = "%"};
 
 local miscTab = library:AddTab("Misc");
 local miscColumn1 = miscTab:AddColumn();
@@ -198,6 +219,7 @@ end});
 
 -- [Discord Button]
 SettingSection:AddButton({text = "Discord", callback = function()
+
 end});
 
 -- [Config Box]
@@ -212,6 +234,24 @@ ConfigSection:AddButton({text = "Create", callback = function()
     writefile(library.foldername .. "/" .. library.flags["Config Name"] .. library.fileext, "{}");
     library.options["Config List"]:AddValue(library.flags["Config Name"]);
 end});
+
+function GetConfigs()
+    if not isfolder(self.foldername) then
+        makefolder(self.foldername)
+        return {}
+    end
+    local files = {}
+    local a = 0
+    for i,v in next, listfiles(self.foldername.."\\skybox") do
+        if v:sub(#v - #self.fileext + 1, #v) == self.fileext then
+            a = a + 1
+            v = v:gsub(self.foldername .. "\\skybox\\", "")
+            v = v:gsub(self.fileext, "")
+            table.insert(files, a, v)
+        end
+    end
+    return files
+end
 
 -- [Save Button]
 ConfigSection:AddButton({text = "Save", callback = function()
@@ -321,6 +361,50 @@ function shootWeapon()
     dwLocalPlayer.PlayerGui.GUI.Client.Variables.Held.Value = false
 end
 
+function Beam(v1, v2)
+    local Part = Instance.new("Part", workspace)
+    Part.Size = Vector3.new(1, 1, 1)
+    Part.Transparency = 1
+    Part.CanCollide = false
+    Part.CFrame = CFrame.new(v1)
+    Part.Anchored = true
+    local AttachmentP1 = Instance.new("Attachment")
+    AttachmentP1.Parent = Part
+
+    local Part2 = Instance.new("Part")
+    Part2.Parent = game.Workspace
+    Part2.Size = Vector3.new(1, 1, 1)
+    Part2.Transparency = 1
+    Part2.CanCollide = false
+    Part2.CFrame = CFrame.new(v2)
+    Part2.Anchored = true
+    Part2.Color = Color3.fromRGB(255,0,0)
+
+    local AttachmentP2 = Instance.new("Attachment")
+    AttachmentP2.Parent = Part2
+    local Beam = Instance.new("Beam")
+    Beam.Parent = Part2
+    Beam.FaceCamera = true
+    Beam.Color = ColorSequence.new(
+        library.flags["tracercolor"]
+    )
+    Beam.Attachment0 = AttachmentP1
+    Beam.Attachment1 = AttachmentP2
+    Beam.LightEmission = 6
+    Beam.LightInfluence = 1
+    Beam.Width0 = 0.01
+    Beam.Width1 = 0.05
+
+    delay(1, function()
+        for i = 0.5, 1, 0.02 do
+            wait()
+            Beam.Transparency = NumberSequence.new(i)
+        end
+        Part:Destroy()
+        Part2:Destroy()
+    end)
+end
+
 local target = nil
 local velocity = Vector3.new(0, 1, 0)
 
@@ -398,11 +482,7 @@ game:GetService("RunService").RenderStepped:Connect(function(frame)
     if library.flags["autoshoot"] then
         if library.flags["silentaimbot"] then
             if closest and closest.Character[library.flags["aimbotbone"]] and dwCurrentWeapon ~= "Knife" and dwCurrentWeapon ~= "Golden Knife" then
-                dwLocalPlayer.PlayerGui.GUI.Client.Variables.Held.Value = true
-            elseif UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-                dwLocalPlayer.PlayerGui.GUI.Client.Variables.Held.Value = true
-            else
-                dwLocalPlayer.PlayerGui.GUI.Client.Variables.Held.Value = false
+                shootWeapon()
             end
         end
     end
@@ -463,6 +543,40 @@ game:GetService("RunService").RenderStepped:Connect(function(frame)
             end
         end
     end
+
+    if library.flags["triggerbot"] then
+        if dwLocalPlayer.Character ~= nil and dwLocalPlayer.Character:FindFirstChild("Humanoid") ~= nil and dwLocalPlayer.Character:FindFirstChild("Humanoid").Health > 0 and dwMouse.Target.Parent:FindFirstChild("Humanoid") ~= nil and dwMouse.Target.Parent.Name ~= dwLocalPlayer.Name and dwMouse.Target.Parent:FindFirstChild("Humanoid").Health > 0 then
+            local target = game:GetService("Players"):FindFirstChild(dwMouse.Target.Parent.Name)
+            if target ~= nil and teamcheck(target) then
+                wait(library.flags["tbdelay"] / 1000)
+                shootWeapon()
+            end
+        end
+    end
+end)
+
+dwLocalPlayer.PlayerGui.GUI.Client.Variables.Held:GetPropertyChangedSignal("Value"):Connect(function(t)
+    if t == false then
+        return
+    end
+    if library.flags["bullettracers"] then
+        Beam(dwCamera and dwCamera.CFrame.p or dwLocalPlayer.Character:FindFirstChild("Head").Position, dwMouse.Hit.Position)
+    end
+end)
+
+dwLocalPlayer.Damage:GetPropertyChangedSignal("Value"):Connect(function(t)
+    if t == 0 then
+        return
+    end
+
+    if library.flags["hitsound"] then
+        local sound = Instance.new("Sound")
+        sound.Parent = game:GetService("SoundService")
+        sound.SoundId = hitsounds[library.flags["hitsoundlist"]]
+        sound.Volume = 1
+        sound.PlayOnRemove = true
+        sound:Destroy()
+    end
 end)
 
 --remote redirection
@@ -479,7 +593,7 @@ local Old; Old = hookmetamethod(game, "__namecall", function(Self, ...)
                 end
             end
         end
-    
+
         if closest and closest.Character[library.flags["aimbotbone"]] and not checkcaller() and Method == "FireServer" and Self.Name == ("ReplicateProjectile") then
             if library.flags["silentaimbot"] then
                 args[1][10] = closest.Character[library.flags["aimbotbone"]].Position
@@ -487,13 +601,13 @@ local Old; Old = hookmetamethod(game, "__namecall", function(Self, ...)
                 --args[1][4] = closest.Character[library.flags["aimbotbone"]].CFrame
             end
         end
-    
+
         if closest and closest.Character[library.flags["aimbotbone"]] and not checkcaller() and Method == "FireServer" and Self.Name == utf8.char(8203, 72, 105, 116, 80, 97, 114, 116) then
             if library.flags["silentaimbot"] then
                 args[1] = closest.Character.Head
             end
         end
-    
+
         if closest and closest.Character[library.flags["aimbotbone"]] and Self.Name == "Workspace" and Method == "FindPartOnRayWithIgnoreList" then
             if library.flags["silentaimbot"] then
                 return closest.Character[library.flags["aimbotbone"]], closest.Character[library.flags["aimbotbone"]].Position, closest.Character[library.flags["aimbotbone"]].Position.Unit, closest.Character[library.flags["aimbotbone"]].Material
@@ -774,14 +888,19 @@ function drawHumanESP(v)
     end)
 end
 
+function RotateVect(v, a) --donated by a sweet young man
+    a = math.rad(a)
+    local x = v.X * math.cos(a) - v.Y * math.sin(a)
+    local y = v.X * math.sin(a) + v.Y * math.cos(a)
+
+    return Vector2.new(x, y)
+end
+
 function drawIndicators(v)
-    local Indicator = Drawing.new('Circle');
-    Indicator.Radius = 30;
+    local Indicator = Drawing.new('Triangle');
     Indicator.Thickness = 1
     Indicator.Color = Color3.fromRGB(255, 255, 255);
     Indicator.Filled = false;
-    Indicator.NumSides = 32; -- Circles aren't drawn perfectly; more "sides" = more lag
-    Indicator.Position = Vector2.new(20, 20); -- pixels offset from top right
     Indicator.Transparency = 0.9;
 
     dwRunservice.RenderStepped:Connect(function()
@@ -807,34 +926,18 @@ function drawIndicators(v)
             if displayEsp == false and v ~= dwLocalPlayer then
                 local Center = (dwCamera.ViewportSize / 2)
                 local Direction = (Vector2.new(ScreenPosition.X, ScreenPosition.Y) - Center).Unit
-                local Radian = math.atan2(Direction.X, Direction.Y)
-                local Angle = (((math.pi * 2) / 500) * Radian)
-                local ClampedPosition = (Center + (Direction * math.min(math.abs(((Center.Y - 500) / math.sin(Angle)) * 500), math.abs((Center.X - 500) / (math.cos(Angle)) / 2))))
-                Indicator.Position = Vector2.new((ClampedPosition.X - (Indicator.Radius / 2)), ((ClampedPosition.Y - (Indicator.Radius / 2) - 15)))
-                --Indicator.Position = (-math.deg(Radian) + 180)
+
                 if teamcheck(v) then
-                    Indicator.Color = Color3.fromRGB(255,0,0)
+                    Indicator.Color = library.flags["indcolor"]
                     Indicator.Visible = library.flags["indicators"]
                 else
-                    Indicator.Color = Color3.fromRGB(0,0,255)
+                    Indicator.Color = library.flags["espteamcolor"]
                     Indicator.Visible = library.flags["indicators"] and library.flags["espshowteam"]
                 end
 
-                if library.flags["indynamic"] then
-
-                    local Magnitude = ((1 / (dwLocalPlayer.Character.HumanoidRootPart.Position - WorldPosition).Magnitude) * 1000)
-
-                    if Magnitude > 18 then
-                        Magnitude = 18
-                    elseif Magnitude < 11 then
-                        Magnitude = 11
-                    end
-
-                    Indicator.Radius = (Magnitude + 3)
-
-                else
-                    Indicator.Radius = 10
-                end
+                Indicator.PointA = Vector2.new(math.round(dwCamera.ViewportSize.X/2 - Direction.X * library.flags["indradius"] + RotateVect(Direction, 90).X * 14/2), math.round(dwCamera.ViewportSize.Y/2 - Direction.Y * library.flags["indradius"] + RotateVect(Direction, 90).Y * 14/2))
+                Indicator.PointB = Vector2.new(math.round(dwCamera.ViewportSize.X/2 - Direction.X * library.flags["indradius"] + RotateVect(Direction, -90).X * 14/2), math.round(dwCamera.ViewportSize.Y/2 - Direction.Y * library.flags["indradius"] + RotateVect(Direction, -90).Y * 14/2))
+                Indicator.PointC = Vector2.new(math.round(dwCamera.ViewportSize.X/2 - Direction.X * (library.flags["indradius"] + 10)), math.round(dwCamera.ViewportSize.Y/2 - Direction.Y * (library.flags["indradius"] + 10)))
             else
                 Indicator.Visible = false
             end
